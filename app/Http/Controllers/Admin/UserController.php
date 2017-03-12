@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use \Validator;
+use \DB;
 
 class UserController extends Controller
 {
@@ -61,18 +63,25 @@ class UserController extends Controller
         $input = [
             'name' => $request->get('name'),
             'email' => $request->get('email'),
+            'is_admin' => 1,
             'status' => 1,
             'created_at' => time(),
             'updated_at' => time()
         ];
-        $rules = ['name' => 'required|numeric'];
+        $rules = ['name' => 'required|string', 'email' => 'required|email',];
         $messages = [
-            'required' => 'The  field is required.',
-
+            'required' => ':attribute  field is required . ',
+            'string' => ':attribute  field is required string . ',
+            'email' => ':attribute  field is required email . ',
         ];
+        $attributes = ['name' => '姓名','email'=>'邮箱'];
 
-        $validator = Validator::make($input, $rules, $messages);
-        $isAlready = DB::table('role')->where('name', $input['name'])->first();
+        $validator = Validator::make($input, $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
+
+        $isAlready = DB::table('user')->where('name', $input['name'])->first();
         if ($isAlready) {
             return response()->json(['success' => false, 'reason' => '用户名称已存在']);
         }
@@ -93,6 +102,18 @@ class UserController extends Controller
         $name = $request->get('name');
         $email = $request->get('email');
 
+        $rules = ['name' => 'required|string', 'email' => 'required|email',];
+        $messages = [
+            'required' => ':attribute  field is required . ',
+            'string' => ':attribute  field is required string . ',
+            'email' => ':attribute  field is required email . ',
+        ];
+        $attributes = ['name' => '姓名','email'=>'邮箱'];
+
+        $validator = Validator::make(['name' => $name, 'email' => $email], $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
 
         if (!$userInfo) {
             return response()->json(['success' => false, 'reason' => '用户id有误']);
@@ -100,7 +121,7 @@ class UserController extends Controller
         } else {
             $existRole = DB::table('user')->where('name', $name)->first();
             if ($existRole && ($existRole->id != $userId)) {
-                return response()->json(['success' => false, 'reason' => '角色名称已存在']);
+                return response()->json(['success' => false, 'reason' => '用户名已存在']);
 
             }
             $res = DB::table('user')->where('id', $userId)->update(['name' => $name, 'email' => $email, 'updated_at' => time()]);

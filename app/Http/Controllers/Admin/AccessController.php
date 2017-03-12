@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
-use App\Models\User;
+use App\Models\Access;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use \Validator;
+use \DB;
 
 class AccessController extends Controller
 {
@@ -17,13 +17,13 @@ class AccessController extends Controller
      */
     public function lists()
     {
-        $accessList = Access::all();
+        $accessList = Access::all(['id','title','urls']);
         return response()->json(['success' => true, 'data' => $accessList]);
 
     }
 
     /**
-     * 添加角色
+     * 添加权限
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -36,7 +36,20 @@ class AccessController extends Controller
             'created_at' => time(),
             'updated_at' => time()
         ];
+        $rules = ['title' => 'required|string|min:2|max:12'];
+        $messages = [
+            'required' => ':attribute field is required.',
+            'min' => ':attribute 最小长度为:min.',
+            'max' => ':attribute 最大长度为:max.',
+        ];
+        $attributes = [
+            'title' => '权限名称'
+        ];
 
+        $validator = Validator::make($input, $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
         $isAlready = DB::table('access')->where('title', $input['title'])->first();
         if ($isAlready) {
             return response()->json(['success' => false, 'reason' => '权限名称已存在']);
@@ -53,23 +66,35 @@ class AccessController extends Controller
     public function modify(Request $request)
     {
         $accessId = $request->get('id', 0);
-        $accessInfo = Access::find($roleId);
+        $accessInfo = Access::find($accessId);
 
         $title = $request->get('title');
         $description = $request->get('description');
 
+        $rules = ['title' => 'required|string',];
+        $messages = [
+            'required' => ':attribute  field is required . ',
+            'string' => ':attribute  field is required string . ',
+
+        ];
+        $attributes = ['title' => '权限名称'];
+
+        $validator = Validator::make(['title' => $title], $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
 
         if (!$accessInfo) {
             return response()->json(['success' => false, 'reason' => '权限id有误']);
 
         } else {
             $existAccess = DB::table('access')->where('title', $title)->first();
-            if ($existAccess && ($existAccess->id != $roleId)) {
+            if ($existAccess && ($existAccess->id != $accessId)) {
 
-                return response()->json(['success' => false, 'reason' => '角色名称已存在']);
+                return response()->json(['success' => false, 'reason' => '权限名称已存在']);
 
             }
-            $res = DB::table('title')->where('id', $roleId)->update(['title' => $title, 'description' => $description, 'updated_at' => time()]);
+            $res = DB::table('access')->where('id', $accessId)->update(['title' => $title, 'description' => $description, 'updated_at' => time()]);
             return response()->json(['data' => $res]);
         }
     }
@@ -79,7 +104,8 @@ class AccessController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delAccess(Request $request){
-        return response()->json(['success'=>true]);
+    public function delAccess(Request $request)
+    {
+        return response()->json(['success' => true]);
     }
 }

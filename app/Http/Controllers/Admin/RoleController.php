@@ -17,7 +17,7 @@ class RoleController extends Controller
      */
     public function lists()
     {
-        $roleList = Role::all();
+        $roleList = Role::all(['id','name']);
         return response()->json(['success' => true, 'data' => $roleList]);
 
     }
@@ -36,13 +36,20 @@ class RoleController extends Controller
             'created_at' => time(),
             'updated_at' => time()
         ];
-        $rules = ['name' => 'required|numeric'];
+        $rules = ['name' => 'required|string|min:2|max:12'];
         $messages = [
-            'required' => 'The  field is required.',
-
+            'required' => ':attribute field is required.',
+            'min' => ':attribute 最小长度为:min.',
+            'max' => ':attribute 最大长度为:max.',
+        ];
+        $attributes = [
+            'name' => '角色名称'
         ];
 
-        $validator = Validator::make($input, $rules, $messages);
+        $validator = Validator::make($input, $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
         $isAlready = DB::table('role')->where('name', $input['name'])->first();
         if ($isAlready) {
             return response()->json(['success' => false, 'reason' => '角色名称已存在']);
@@ -64,6 +71,23 @@ class RoleController extends Controller
         $name = $request->get('name');
         $description = $request->get('description');
 
+        $rules = ['name' => 'required|string|min:2|max:12'];
+        $messages = [
+            'required' => ':attribute field is required.',
+            'min' => ':attribute 最小长度为:min.',
+            'max' => ':attribute 最大长度为:max.',
+        ];
+        $attributes = [
+            'name' => '角色名称'
+        ];
+
+        $validator = Validator::make([
+            'name' => $name,
+            'description' => $description,
+        ], $rules, $messages, $attributes);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'reason' => $validator->messages()->first()]);
+        }
 
         if (!$roleInfo) {
             return response()->json(['success' => false, 'reason' => '角色id有误']);
@@ -85,7 +109,8 @@ class RoleController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setRoleAccess(Request $request){
-        return response()->json(['success'=>true]);
+    public function setRoleAccess(Request $request)
+    {
+        return response()->json(['success' => true]);
     }
 }
