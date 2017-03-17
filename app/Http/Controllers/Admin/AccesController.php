@@ -9,34 +9,47 @@ use Illuminate\Http\Request;
 use \Validator;
 use \DB;
 
-class AccessController extends Controller
+class AccesController extends Controller
 {
     /**
-     * 查询所有权限列表
-     * @return \Illuminate\Http\JsonResponse
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
      */
-    public function lists()
+    public function index()
     {
-        $accessList = Access::all(['id','title','urls']);
-        return response()->json(['success' => true, 'data' => $accessList]);
-
+        $accessList = Access::all(['id', 'title', 'urls']);
+//        return response()->json(['success' => true, 'data' => $accessList]);
+        return view('access', ['data' => ['title' => '权限列表', 'accessList' => $accessList]]);
     }
 
     /**
-     * 添加权限
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
      */
-    function save(Request $request)
+    public function create()
+    {
+        return view('access_add', ['data' => ['title' => '新增权限']]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
     {
         $input = [
             'title' => $request->get('title'),
             'description' => $request->get('description'),
+            'urls' => $request->get('urls'),
             'status' => 1,
             'created_at' => time(),
             'updated_at' => time()
         ];
-        $rules = ['title' => 'required|string|min:2|max:12'];
+        $rules = ['title' => 'required|string|min:2|max:12', 'urls' =>'required|string' ];
         $messages = [
             'required' => ':attribute field is required.',
             'min' => ':attribute 最小长度为:min.',
@@ -59,16 +72,43 @@ class AccessController extends Controller
     }
 
     /**
-     * 编辑权限
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Display the specified resource.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
      */
-    public function modify(Request $request)
+    public function show($id)
     {
-        $accessId = $request->get('id', 0);
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+
+        $accessInfo = Access::find($id);
+        return view('access_edit', ['data' => ['title' => '编辑用户', 'accessInfo' => $accessInfo]]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $accessId)
+    {
+//        $accessId = $request->get('id', 0);
         $accessInfo = Access::find($accessId);
 
         $title = $request->get('title');
+        $urls = $request->get('urls');
         $description = $request->get('description');
 
         $rules = ['title' => 'required|string',];
@@ -90,22 +130,22 @@ class AccessController extends Controller
         } else {
             $existAccess = DB::table('access')->where('title', $title)->first();
             if ($existAccess && ($existAccess->id != $accessId)) {
-
                 return response()->json(['success' => false, 'reason' => '权限名称已存在']);
 
             }
-            $res = DB::table('access')->where('id', $accessId)->update(['title' => $title, 'description' => $description, 'updated_at' => time()]);
+            $res = DB::table('access')->where('id', $accessId)->update(['title' => $title, 'urls' => $urls, 'description' => $description, 'updated_at' => time()]);
             return response()->json(['data' => $res]);
         }
     }
 
     /**
-     * 删除权限
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
      */
-    public function delAccess(Request $request)
+    public function destroy($id)
     {
-        return response()->json(['success' => true]);
+        //
     }
 }
