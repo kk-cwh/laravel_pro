@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class HomeController extends Controller
 {
@@ -30,8 +31,13 @@ class HomeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        return view('home',['data'=>['title'=>'主页','content'=>'这里是主页了啊芭芭拉。。。']]);
+    {    $image = new \App\Lib\Captcha();
+         response('',200,['Content-Type'=>'image/gif']);
+        $content = $image->create();
+        return response($content, 200, [
+            'Content-Type' => 'image/png',
+        ]);
+//        return view('home',['data'=>['title'=>'主页','content'=>'这里是主页了啊芭芭拉。。。']]);
 
     }
 
@@ -42,7 +48,7 @@ class HomeController extends Controller
      */
     public function create()
     {
-        //
+        return view('back_login');
     }
 
     /**

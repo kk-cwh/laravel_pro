@@ -27,6 +27,7 @@
 
     </table>
     <p>
+        <image height="20" src="http://localhost:8000/home/" width="80">换一张</image>
         {{$data['content']}}
     </p>
 @stop

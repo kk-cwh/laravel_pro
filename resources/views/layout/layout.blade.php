@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel {{$data['title']}}</title>
+    <title>Laravel</title>
 
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
@@ -154,8 +154,8 @@
             <div class="col-sm-3 col-md-2 col-lg-2 sidebar">
                 <ul class="nav nav-sidebar">
                     <li>权限演示页面</li>
-                    <li><a href="/home/page1">页面一</a></li>
-                    <li><a href="/home/page2">页面二</a></li>
+                    <li><a href="/home/cate">商品分类</a></li>
+                    <li><a href="/home/product">商品列表</a></li>
                     <li><a href="/home/page3">页面三</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
@@ -169,14 +169,14 @@
         @show
         <div class="col-sm-9 col-sm-offset-3 col-md-10  col-md-offset-2 col-lg-10 col-lg-offset-2">
             @yield('content','内容区域')
-            <hr/>
-            <footer>
-                <p class="pull-left">@天空之城</p>
-                <p class="pull-right">power by zhangyake</p>
-            </footer>
         </div>
+        <hr/>
+        <footer>
+            <p class="pull-right">power by zhangyake</p>
+        </footer>
+
     </div>
 
-
+</div>
 </body>
 </html>

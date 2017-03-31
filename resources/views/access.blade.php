@@ -21,5 +21,6 @@
     </table>
     <p>
 
+    <div class="pull-right">    {{$data['accessList']->links()}}</div>
     </p>
 @stop

@@ -5,14 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use \Validator;
 use \DB;
 
 class UserController extends Controller
 {
+    function loginView(Request $request)
+    {
+        return view('back_login');
+    }
     function login(Request $request)
     {
+
+        $code = $request->get('code');
+
+        return \Session::get('captcha_code');
+
+
         $userId = $request->get('uid', 0);
         if (!$userId) {
             return response()->json(['success' => false, 'reason' => '账号id有误']);
@@ -33,7 +44,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $userList = User::all();
+        $userList = User::paginate(2);
 //        return response()->json(['success' => true, 'data' => $userList]);
         return view('user', ['data' => ['title' => '用户列表', 'userList' => $userList]]);
     }
@@ -113,9 +124,29 @@ class UserController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request,$id)
     {
-        //
+        $userId =2;
+        $method = 'GET';
+        $res = DB::table('user')
+            ->join('user_role', 'user.id', '=', 'user_role.user_id')
+            ->join('role_access', 'user_role.role_id', '=', 'role_access.role_id')
+            ->join('access', 'access.id', '=', 'role_access.access_id')
+            ->select('access.id', 'access.urls', 'access.method')
+            ->where('user.id','=',$userId)
+            ->where('access.method','=',$method)
+            ->get();
+        $path = $request->path();
+        $canFanwen = false;
+        foreach ($res as $url){
+            $m = $this->urlMatch($url->urls,$path);
+            if ($m){
+                $canFanwen = 'yes';
+                break;
+            }
+        }
+
+        return response()->json(['success' => true, 'data' => $res,'url'=>$canFanwen]);
     }
 
     /**
@@ -218,5 +249,24 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    function urlMatch($reqUrl,$userUrl){
+        $reqPathArray = explode('/',$reqUrl);
+        $userUrlArray = explode('/',$userUrl);
+        if ( count($reqPathArray)!= count($userUrlArray) ){
+            return false;
+        }
+        for ( $i=0 ; $i < count($reqPathArray) ; $i++){
+            if ($reqPathArray[$i]==$userUrlArray[$i]){
+                continue;
+            }
+            if ($reqPathArray[$i].startsWith('{') && $reqPathArray[$i].endsWith("}")){
+                continue;
+            }
+            return false;
+        }
+        return true;
+
     }
 }

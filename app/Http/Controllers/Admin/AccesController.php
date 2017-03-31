@@ -18,7 +18,7 @@ class AccesController extends Controller
      */
     public function index()
     {
-        $accessList = Access::all(['id', 'title', 'urls']);
+        $accessList = Access::paginate(5);
 //        return response()->json(['success' => true, 'data' => $accessList]);
         return view('access', ['data' => ['title' => '权限列表', 'accessList' => $accessList]]);
     }
@@ -45,11 +45,12 @@ class AccesController extends Controller
             'title' => $request->get('title'),
             'description' => $request->get('description'),
             'urls' => $request->get('urls'),
+            'method' => $request->get('method'),
             'status' => 1,
             'created_at' => time(),
             'updated_at' => time()
         ];
-        $rules = ['title' => 'required|string|min:2|max:12', 'urls' =>'required|string' ];
+        $rules = ['title' => 'required|string|min:2|max:12', 'urls' =>'required|string' ,'method'=>'required'];
         $messages = [
             'required' => ':attribute field is required.',
             'min' => ':attribute 最小长度为:min.',

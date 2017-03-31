@@ -20,6 +20,6 @@
 
     </table>
     <p>
-
+    <div class="pull-right">  {{$data['userList']->links()}}<div
     </p>
 @stop

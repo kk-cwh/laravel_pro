@@ -28,7 +28,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roleList = Role::all(['id', 'name']);
+        $roleList = Role::paginate(5);
 //        return response()->json(['success' => true, 'data' => $roleList]);
         return view('role', ['data' => ['title' => '角色列表', 'roleList' => $roleList]]);
     }

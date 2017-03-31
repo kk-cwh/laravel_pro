@@ -12,6 +12,7 @@
 */
 
 Route::get('/', function () {
+
     return view('welcome');
 });
 
@@ -21,6 +22,7 @@ Route::group(['prefix' => 'home', 'namespace' => 'Admin'], function () {
     Route::get('/page1', 'HomeController@page1');
     Route::get('/page2', 'HomeController@page2');
     Route::get('/page3', 'HomeController@page3');
+
 
     /*角色相关路由*/
     // 新增页面视图
@@ -71,6 +73,37 @@ Route::group(['prefix' => 'home', 'namespace' => 'Admin'], function () {
     // 删除信息
     Route::delete('/access/{id}', 'AccesController@destroy');
 
+    /*商品分类相关路路由*/
+    Route::get('/cate/create', 'CateController@create');
+    // 新增
+    Route::post('/cate', 'CateController@store');
+    // 查询列表
+    Route::get('/cate', 'CateController@index');
+    // 查看详情
+    Route::get('/cate/{id}', 'CateController@show');
+    // 修改页面视图
+    Route::get('/cate/{id}/edit', 'CateController@edit');
+    // 修改信息
+    Route::put('/cate/{id}', 'CateController@update');
+    // 删除信息
+    Route::delete('/cate/{id}', 'CateController@destroy');
 
-    Route::get('/login', 'UserController@login');
+    /*商品相关路路由*/
+    Route::get('/product/create', 'ProductController@create');
+    // 新增
+    Route::post('/product', 'ProductController@store');
+    // 查询列表
+    Route::get('/product', 'ProductController@index');
+    // 查看详情
+    Route::get('/product/{id}', 'ProductController@show');
+    // 修改页面视图
+    Route::get('/product/{id}/edit', 'ProductController@edit');
+    // 修改信息
+    Route::put('/product/{id}', 'ProductController@update');
+    // 删除信息
+    Route::delete('/product/{id}', 'ProductController@destroy');
+
+
+    Route::get('/login', 'UserController@loginView');
+    Route::post('/user/login', 'UserController@login');
 });

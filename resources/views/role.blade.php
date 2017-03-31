@@ -18,6 +18,6 @@
 
     </table>
     <p>
-
+    <div class="pull-right">   {{$data['roleList']->links()}}</div>
     </p>
 @stop
